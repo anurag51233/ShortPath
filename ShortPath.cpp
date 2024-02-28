@@ -1,6 +1,4 @@
-#include <SFML/Graphics.hpp>
-#include <iostream>
-
+#include "ShortPath.h"
 
 
 
@@ -14,7 +12,7 @@ int main()
 #pragma region Defines paths and lines
 
     bool bDrawLineMouse = false;
-    
+    bool bFindPath = false;
     //Contains all the paths 
     std::vector<sf::Vertex> paths;
 
@@ -25,13 +23,43 @@ int main()
                          };
 
     // Set the line color (optional)
-    line[0].color = sf::Color::Red;
-    line[1].color = sf::Color::Red;
+    line[0].color = sf::Color::White;
+    line[1].color = sf::Color::White;
+
+    sf::Vertex point[2];
 
 
     paths.push_back(line[0]);
     paths.push_back(line[1]);
 
+#pragma endregion
+
+
+#pragma region Defines for scanning path
+    sf::Image winimage;
+    sf::Texture texture;
+
+    sf::CircleShape circlepoint1(5.f);
+    sf::CircleShape circlepoint2(5.f);
+    circlepoint1.setFillColor(sf::Color(100, 250, 50));
+    circlepoint2.setFillColor(sf::Color(100, 250, 50));
+#pragma endregion
+
+
+#pragma region Text Code
+    sf::Font font;
+    if (!font.loadFromFile("res/Fonts/Banana.ttf"))
+    {
+        std::cout << "font was not loaded " << std::endl;
+        window.close();
+    }
+
+    sf::Text *text = new sf::Text();
+    text->setFont(font);
+    text->setString("press 'F' for finding path");
+    text->setCharacterSize(24);
+    text->setFillColor(sf::Color::White);
+    text->setPosition(sf::Vector2f(100,10));
 #pragma endregion
 
 
@@ -77,20 +105,40 @@ int main()
 #pragma endregion
 
 
-#pragma region Creating paths
+#pragma region Creating & Finding paths
+            // For drawing paths and getting the point from the user 
+            // winimage is updated to have 
+
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::F)
+                {
+                    bFindPath = true;
+                    line[0].color = sf::Color::Red;
+                    line[1].color = sf::Color::Red;
+                }
+            }
 
 
+           
+            //Draw paths 
             /// mouse movement for drawing stuffs
             if (event.type == sf::Event::MouseButtonPressed)
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
+                    
                     bDrawLineMouse = true; 
                     line[0].position.x = event.mouseButton.x;
                     line[0].position.y = event.mouseButton.y;
                     line[1].position.x = event.mouseButton.x;
                     line[1].position.y = event.mouseButton.y;
+                    if (bFindPath)
+                    {
+                        point[0] = line[0];
+                        point[1] = line[1];
 
+                    }
                 }
             }
 
@@ -100,6 +148,12 @@ int main()
                 {
                     line[1].position.x = event.mouseMove.x;
                     line[1].position.y = event.mouseMove.y;
+                    if (bFindPath)
+                    {
+                        point[0] = line[0];
+                        point[1] = line[1];
+
+                    }
                 }
             }
 
@@ -108,18 +162,32 @@ int main()
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
                     bDrawLineMouse = false;
-                    paths.push_back(line[0]);
-                    paths.push_back(line[1]);
+                    if (!bFindPath)
+                    {
+                        paths.push_back(line[0]);
+                        paths.push_back(line[1]);
+                    }
+                    
 
                 }
             }
+
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Enter)
+                {
+                    //find path 
+                    // Capture the window content into the texture
+                    sf::Vector2u windowSize = window.getSize();
+                    texture.create(windowSize.x, windowSize.y);
+                    texture.update(window);
+                    winimage = texture.copyToImage();
+                }
+            }
+           
 #pragma endregion
 
-            /*if (event.type == sf::Event::TextEntered)
-            {
-                if (event.text.unicode < 128)
-                    std::cout << "ASCII character typed: " << static_cast<char>(event.text.unicode) << std::endl;
-            }*/
+           
         }
 
 
@@ -132,13 +200,29 @@ int main()
 
         window.clear();
 
+        window.draw(*text);
 
         window.draw(&paths[0], paths.size(), sf::Lines);
-        window.draw(line, 2, sf::Lines);
 
+        //drawing realtime path or points
+        if (bFindPath)
+        {
+            circlepoint1.setPosition(line[0].position);
+            circlepoint2.setPosition(line[1].position);
+            window.draw(circlepoint1);
+            window.draw(circlepoint2);
+
+        }
+        else
+        {
+            window.draw(line, 2, sf::Lines);
+        }
 
         window.display();
     }
 
     return 0;
 }
+
+
+
