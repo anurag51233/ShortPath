@@ -133,9 +133,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CircleScan.cpp" />
     <ClCompile Include="ShortPath.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CircleScan.h" />
     <ClInclude Include="ShortPath.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

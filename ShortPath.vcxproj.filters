@@ -18,9 +18,15 @@
     <ClCompile Include="ShortPath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CircleScan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ShortPath.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CircleScan.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,5 @@
 #include "ShortPath.h"
+#include "CircleScan.h"
 
 
 
@@ -6,17 +7,23 @@ int main()
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Short Path!!!", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1100, 800), "Short Path!!!", sf::Style::Default, settings);
   
+    std::vector<sf::Vertex> tracecircle;
 
-#pragma region Defines paths and lines
+#pragma region TestCode
+
+#pragma endregion
+
+
+#pragma region Defines paths and lines and points
 
     bool bDrawLineMouse = false;
     bool bFindPath = false;
-    //Contains all the paths 
+    //Contains all the path i.e. lines
     std::vector<sf::Vertex> paths;
 
-    //a ref line
+    //a ref line when moving mouse
     sf::Vertex line[2] = {
                             sf::Vertex(sf::Vector2f(10, 10)),
                             sf::Vertex(sf::Vector2f(100, 10))
@@ -26,7 +33,6 @@ int main()
     line[0].color = sf::Color::White;
     line[1].color = sf::Color::White;
 
-    sf::Vertex point[2];
 
 
     paths.push_back(line[0]);
@@ -37,16 +43,21 @@ int main()
 
 #pragma region Defines for scanning path
     sf::Image winimage;
-    sf::Texture texture;
+    sf::Texture wintexture;
 
-    sf::CircleShape circlepoint1(5.f);
-    sf::CircleShape circlepoint2(5.f);
-    circlepoint1.setFillColor(sf::Color(100, 250, 50));
-    circlepoint2.setFillColor(sf::Color(100, 250, 50));
+    NodeCircle nodeCircle;
+
+    //two circle points 
+    sf::Vertex point[2];
+
+    sf::CircleShape circlepoint1(8.f);
+    sf::CircleShape circlepoint2(8.f);
+    circlepoint1.setFillColor(sf::Color(0, 250, 0));
+    circlepoint2.setFillColor(sf::Color(0, 250, 0));
 #pragma endregion
 
 
-#pragma region Text Code
+#pragma region Text&font Code
     sf::Font font;
     if (!font.loadFromFile("res/Fonts/Banana.ttf"))
     {
@@ -105,9 +116,10 @@ int main()
 #pragma endregion
 
 
-#pragma region Creating & Finding paths
+#pragma region Handling Events for Creating paths 
             // For drawing paths and getting the point from the user 
             // winimage is updated to have 
+
 
             if (event.type == sf::Event::KeyPressed)
             {
@@ -137,6 +149,11 @@ int main()
                     {
                         point[0] = line[0];
                         point[1] = line[1];
+                        point[0].position.x -= 8;
+                        point[0].position.y -= 8;
+
+                        point[1].position.x -= 8;
+                        point[1].position.y -= 8;
 
                     }
                 }
@@ -152,7 +169,11 @@ int main()
                     {
                         point[0] = line[0];
                         point[1] = line[1];
+                        point[0].position.x -= 8;
+                        point[0].position.y -= 8;
 
+                        point[1].position.x -= 8;
+                        point[1].position.y -= 8;
                     }
                 }
             }
@@ -164,29 +185,35 @@ int main()
                     bDrawLineMouse = false;
                     if (!bFindPath)
                     {
-                        paths.push_back(line[0]);
-                        paths.push_back(line[1]);
+                        AddLineToPath(paths, line);
                     }
                     
 
                 }
             }
 
+           
+#pragma endregion
+            
+            //Finding path code
             if (event.type == sf::Event::KeyPressed)
             {
                 if (event.key.code == sf::Keyboard::Enter)
                 {
-                    //find path 
+                    
                     // Capture the window content into the texture
                     sf::Vector2u windowSize = window.getSize();
-                    texture.create(windowSize.x, windowSize.y);
-                    texture.update(window);
-                    winimage = texture.copyToImage();
+                    wintexture.create(windowSize.x, windowSize.y);
+                    wintexture.update(window);
+                    winimage = wintexture.copyToImage();
+                    std::cout << "scanning circle" << std::endl;
+
+                    
+                    //TODO: Code to be removed 
+                    scanCircleBres(point[0].position.x+8, point[0].position.y+8, 10, tracecircle, winimage);
+
                 }
             }
-           
-#pragma endregion
-
            
         }
 
@@ -197,18 +224,18 @@ int main()
 
 
 
-
+        //////----------window handling segment----------//////
         window.clear();
 
         window.draw(*text);
 
         window.draw(&paths[0], paths.size(), sf::Lines);
 
-        //drawing realtime path or points
+        // showing lines or points when mouse is moved 
         if (bFindPath)
         {
-            circlepoint1.setPosition(line[0].position);
-            circlepoint2.setPosition(line[1].position);
+            circlepoint1.setPosition(point[0].position);
+            circlepoint2.setPosition(point[1].position);
             window.draw(circlepoint1);
             window.draw(circlepoint2);
 
@@ -218,11 +245,43 @@ int main()
             window.draw(line, 2, sf::Lines);
         }
 
+        //test draw
+        if (!tracecircle.empty())
+        {
+            window.draw(&tracecircle[0], tracecircle.size(), sf::Points);
+            
+
+        }
+
+
+
         window.display();
     }
 
     return 0;
 }
 
+void AddLineToPath(std::vector<sf::Vertex>& paths, sf::Vertex line[2])
+{
+    paths.push_back(line[0]);
+    paths.push_back(line[1]);
 
+    line[0].position.x += 1;
+    line[0].position.y -= 1;
+    line[1].position.x += 1;
+    line[1].position.y -= 1;
 
+    paths.push_back(line[0]);
+    paths.push_back(line[1]);
+
+    line[0].position.x -= 2;
+    line[1].position.x -= 2;
+
+    paths.push_back(line[0]);
+    paths.push_back(line[1]);
+
+    line[0].position.x += 1;
+    line[0].position.y += 1;
+    line[1].position.x += 1;
+    line[1].position.y += 2;
+}
