@@ -18,7 +18,13 @@
     <ClCompile Include="ShortPath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CircleScan.cpp">
+    <ClCompile Include="Scan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TracePath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -26,8 +32,14 @@
     <ClInclude Include="ShortPath.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="CircleScan.h">
+    <ClInclude Include="Scan.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TracePath.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -133,12 +133,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CircleScan.cpp" />
+    <ClCompile Include="Scan.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="ShortPath.cpp" />
+    <ClCompile Include="TracePath.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CircleScan.h" />
+    <ClInclude Include="Scan.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="ShortPath.h" />
+    <ClInclude Include="TracePath.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
