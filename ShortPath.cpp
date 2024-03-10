@@ -240,6 +240,7 @@ int main()
                     wintexture.create(windowSize.x, windowSize.y);
                     wintexture.update(window);
                     winimage = wintexture.copyToImage();
+
                     std::cout << "scanning circle" << std::endl;
 
 
@@ -312,6 +313,7 @@ int main()
                 if (event.key.code == sf::Keyboard::P)
                 {
                     /// ======= pop out pathsForTracing to trace it tempPathTracing ---> allpath =======
+                newtrace:                    
                     if(!pathsForTracing.paths.empty())
                     {
 
@@ -325,11 +327,14 @@ int main()
 
 
 
-
+            endofT:
                 ///----------middle nodes path tracing -------------
                 if (event.key.code == sf::Keyboard::T)
                 {
-                    tracetime++;
+                    sf::Vector2u windowSize = window.getSize();
+                    wintexture.create(windowSize.x, windowSize.y);
+                    wintexture.update(window);
+                    winimage = wintexture.copyToImage();
 
                     std::cout << "pressed t" << std::endl;
                     for (size_t i = 0; i < pathsForTracing.paths.size(); i++)
@@ -339,8 +344,7 @@ int main()
 
 
                     
-
-
+                    if (tempPathTracing.paths.size() == 0) { goto endofT; }
                     //scan for the tracepoints.back().head
                     tracepoints.clear();
                     scanCircleBres(tempPathTracing.paths.back().head.x, tempPathTracing.paths.back().head.y, 20.0f, tracepoints, winimage);
@@ -370,44 +374,33 @@ int main()
                     }
 
 
-                    //if (tracetime >= 4)
-                    //{
-                    //    std::cout << "scanning node ..." << std::endl;
+                   
+                        //if node is struct
+                        if (!tracepoints.empty())
+                        {
+                            int structNodenum = -1;
 
-                    //    //if node is struct
-                    //    if (!tracepoints.empty())
-                    //    {
-                    //        int structNodenum = 0;
+                            std::cout << "struct the node !!! " << tracepoints.back().position.x << " " << tracepoints.back().position.y << std::endl;
+                            structNodenum = FindNodeCloseToPoint(pathNode.pathNodes[1] , tracepoints.back().position);
 
-                    //        std::cout << "struct the node !!! " << tracepoints.back().position.x << " " << tracepoints.back().position.y << std::endl;
-                    //        structNodenum = FindNodeCloseToPoint(pathNode, tracepoints.back().position);
+                            if (structNodenum != -1)
+                            {
 
-                    //        if (structNodenum != -1)
-                    //        {
+                                //update node of tempPathTracing
+                                for (int i = 0; i < tempPathTracing.paths.size(); i++)
+                                {
+                                    tempPathTracing.paths[i].headNode = structNodenum;
 
-                    //            //update node of tempPathTracing
-                    //            for (int i = 0; i < tempPathTracing.paths.size(); i++)
-                    //            {
-                    //                tempPathTracing.paths[i].headNode = structNodenum;
+                                }
 
-                    //            }
+                                allpaths.push_back(tempPathTracing);
+                                tempPathTracing.paths.clear();
 
-                    //            allpaths.push_back(tempPathTracing);
-                    //            tempPathTracing.paths.clear();
+                                goto newtrace;
 
-                    //            if (!pathsForTracing.paths.empty())
-                    //            {
-
-                    //                tempPathTracing.AddPath(pathsForTracing.paths.back());
-                    //                pathsForTracing.paths.pop_back();
-                    //                std::cout << "picked a node" << std::endl;
-                    //            }
-
-                    //            tracetime = 0;
-                    //            bStruckNode = false;
-                    //        }
-                    //    }
-                    //}
+                            }
+                        }
+                    
 
 
 
@@ -497,6 +490,7 @@ int main()
                         std::cout << "no multiple tracepont error" << std::endl;
 
                         auto nextPoint = scanNextWalkPoint(my::Direction(tempPathTracing.paths.back().head, tempPathTracing.paths.back().tail), winimage, window);
+                        
                         int tailNodenum = tempPathTracing.paths.back().tailNode;
                         tempPathTracing.AddPath(my::Direction(nextPoint, tempPathTracing.paths.back().head));
                         tempPathTracing.paths.back().tailNode = tailNodenum;
@@ -525,6 +519,7 @@ int main()
 
 
                 }
+                
 
             }
 
@@ -584,6 +579,8 @@ int main()
 
 
         window.display();
+
+        
     }
 
     return 0;
@@ -688,22 +685,21 @@ void FilterLinesFromTracePoints(std::vector<sf::Vertex>& vec, sf::Vector2f cente
 
 }
 
-int FindNodeCloseToPoint(my::PathNode& pathNode, sf::Vector2f point)
+int FindNodeCloseToPoint(my::IntersectionNode& pathNode, sf::Vector2f point)
 {
     sf::Vector2f diff;
     float distance;
-    std::cout << "finding node point " << point.x <<" "<< point.y << std::endl;
-    for (size_t i = 0; i < pathNode.pathNodes.size(); i++)
-    {
-        diff.x = pathNode.pathNodes[i].pos.x - point.x;
-        diff.y = pathNode.pathNodes[i].pos.y - point.y;
+    
+        diff.x = pathNode.pos.x - point.x;
+        diff.y = pathNode.pos.y - point.y;
 
         distance = sqrt(diff.x * diff.x + diff.y * diff.y);
-        if (distance < 60.f)
+        if (distance < 30.f)
         {
-            return i;
+            std::cout << "last node found !!!!!!!!!!!!!" << point.x <<" "<< point.y << std::endl;
+            return 1;
         }
-    }
+    
     return -1;
 }
 

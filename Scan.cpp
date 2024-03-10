@@ -336,6 +336,12 @@ sf::Vector2f scanNextWalkPoint(my::Direction movingDirection, sf::Image &winimag
     {
         //getupto the edge of the line
         scanPoint = scanPoint + (direction);
+        {
+            if (distanceOfVector(scanPoint, movingDirection.head) > 40)
+            {
+                break;
+            }
+        }
         
     } while (scanNearPointPixel(scanPoint, winimage));
 

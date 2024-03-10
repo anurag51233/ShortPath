@@ -13,7 +13,7 @@ my::PathNode::~PathNode()
 
 void my::PathNode::AddPathNode(sf::Vector2f posref)
 {
-	IntersectionNode *ref = new IntersectionNode(posref.x,posref.y);
+	IntersectionNode ref(posref.x,posref.y);
 	
 
 	// Update position based on vectorPosition (e.g., add or subtract)
@@ -21,9 +21,9 @@ void my::PathNode::AddPathNode(sf::Vector2f posref)
 	position -= vectorPosition;*/
 
 	
-	ref->text->setString(std::to_string(pathNodes.size()));
+	ref.text->setString(std::to_string(pathNodes.size()));
 
-	pathNodes.push_back(*ref);
+	pathNodes.push_back(ref);
 	
 }
 
